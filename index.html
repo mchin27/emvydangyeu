@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Gửi tình yêu của anh</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+    font-family:'Segoe UI',sans-serif;
+    color:white;
+}
+
+/* MATRIX */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:0;
+}
+
+/* SECTION */
+.section{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:2;
+}
+
+/* CARD */
+.card{
+    background:rgba(255,255,255,0.08);
+    padding:50px;
+    border-radius:25px;
+    backdrop-filter:blur(20px);
+    box-shadow:0 0 60px rgba(255,105,180,0.6);
+    text-align:center;
+}
+
+h1{
+    color:#ff99cc;
+    text-shadow:0 0 20px hotpink;
+}
+
+input{
+    padding:12px;
+    width:240px;
+    border-radius:12px;
+    border:none;
+    text-align:center;
+    margin-top:20px;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(45deg,hotpink,red);
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 0 20px hotpink;
+}
+
+/* SLIDESHOW */
+#slideshow img{
+    max-width:75%;
+    max-height:75%;
+    border-radius:25px;
+    box-shadow:0 0 50px pink;
+    opacity:0;
+    transition:opacity 1.5s, transform 4s;
+}
+
+/* LOVE TEXT */
+#loveText{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    font-size:50px;
+    color:#ff66cc;
+    text-shadow:0 0 30px hotpink;
+    z-index:3;
+    opacity:0;
+    transition:opacity 1.5s;
+    pointer-events:none;
+}
+
+/* MUSIC BUTTON */
+#musicToggle{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:5;
+    background:rgba(255,105,180,0.9);
+    border:none;
+    padding:10px 15px;
+    border-radius:20px;
+    color:white;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- NHẠC ONLINE -->
+<audio id="music" loop crossorigin="anonymous">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0a9c6e0.mp3?filename=romantic-background-112189.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" onclick="toggleMusic()">🔊 Nhạc</button>
+
+<canvas id="matrix"></canvas>
+
+<!-- START -->
+<div id="startScreen" class="section">
+<div class="card">
+<h1>💖 Gửi tình yêu của anh 💖</h1>
+<input type="text" id="nameInput" placeholder="Nhập tên của em">
+<br>
+<button onclick="startShow()">Xác nhận 💗</button>
+</div>
+</div>
+
+<!-- SLIDE -->
+<div id="slideshow" class="section" style="display:none;">
+<img id="slideImage">
+</div>
+
+<!-- LOVE TEXT -->
+<div id="loveText"></div>
+
+<script>
+
+/* ================= MATRIX HEART ================= */
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const hearts=["💗","💖","💕","💓","💞","💘"];
+const fontSize=22;
+const columns=canvas.width/fontSize;
+const drops=[];
+
+for(let x=0;x<columns;x++) drops[x]=1;
+
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.07)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#ff4da6";
+ctx.font=fontSize+"px Arial";
+
+for(let i=0;i<drops.length;i++){
+const text=hearts[Math.floor(Math.random()*hearts.length)];
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+if(drops[i]*fontSize>canvas.height&&Math.random()>0.96) drops[i]=0;
+drops[i]++;
+}
+}
+setInterval(draw,50);
+
+/* ================= MUSIC ================= */
+const music=document.getElementById("music");
+music.volume=0;
+
+function fadeInMusic(){
+let vol=0;
+const fade=setInterval(()=>{
+    if(vol<1){
+        vol+=0.05;
+        music.volume=vol;
+    }else{
+        clearInterval(fade);
+    }
+},150);
+}
+
+function toggleMusic(){
+if(music.paused){
+    music.play();
+}else{
+    music.pause();
+}
+}
+
+/* ================= START ================= */
+function startShow(){
+const name=document.getElementById("nameInput").value;
+if(name.trim()==="") return;
+
+music.play().then(()=>fadeInMusic()).catch(()=>{});
+
+document.getElementById("startScreen").style.display="none";
+document.getElementById("slideshow").style.display="flex";
+showSlide();
+}
+
+/* ================= SLIDESHOW ================= */
+const images=[
+"anh1.jpg","anh2.jpg","anh3.jpg","anh4.jpg","anh5.jpg",
+"anh6.jpg","anh7.jpg","anh8.jpg","anh9.jpg","anh10.jpg"
+];
+
+let index=0;
+
+function showSlide(){
+const img=document.getElementById("slideImage");
+img.style.opacity=0;
+img.style.transform="scale(1)";
+
+setTimeout(()=>{
+img.src=images[index];
+img.style.opacity=1;
+img.style.transform="scale(1.1)";
+},500);
+
+index++;
+
+if(index<images.length){
+setTimeout(showSlide,4000);
+}else{
+setTimeout(startLoveStory,4500);
+}
+}
+
+/* ================= LOVE STORY ================= */
+const messages=[
+"Chào EmVy dấu iu của anh",
+"Cảm ơn em thời gian qua đã cho anh biết thế nào là",
+"Lo Lắng",
+"Sợ Hãi",
+"Lo Âu",
+"Nhưng không sao",
+"Chúc em thật hạnh phúc bên anh nhé",
+"I Love You 💖"
+];
+
+let textIndex=0;
+
+function startLoveStory(){
+document.getElementById("slideshow").style.display="none";
+showNextLine();
+}
+
+function showNextLine(){
+if(textIndex>=messages.length) return;
+
+const box=document.getElementById("loveText");
+box.innerHTML=messages[textIndex];
+box.style.opacity=1;
+
+setTimeout(()=>{
+box.style.opacity=0;
+
+setTimeout(()=>{
+textIndex++;
+showNextLine();
+},1500);
+
+},3000);
+}
+
+</script>
+
+</body>
+</html>
