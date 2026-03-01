@@ -69,7 +69,6 @@ button{
     box-shadow:0 0 20px hotpink;
 }
 
-/* SLIDESHOW */
 #slideshow img{
     max-width:75%;
     max-height:75%;
@@ -79,7 +78,6 @@ button{
     transition:opacity 1.5s, transform 4s;
 }
 
-/* LOVE TEXT */
 #loveText{
     position:absolute;
     width:100%;
@@ -97,7 +95,6 @@ button{
     pointer-events:none;
 }
 
-/* MUSIC BUTTON */
 #musicToggle{
     position:fixed;
     top:20px;
@@ -114,13 +111,14 @@ button{
 </head>
 <body>
 
-<!-- NHẠC ONLINE -->
-<canvas id="canvas"></canvas>
-<div id="hint">Chạm màn hình để bật nhạc ❤️</div>
+<audio id="music" loop>
+<source src="noitinhyeubatdau.mp3" type="audio/mpeg">
+</audio>
 
-<audio id="bgm" src="noitinhyeubatdau.mp3" loop></audio>
+<button id="musicToggle" onclick="toggleMusic()">🔊 Nhạc</button>
 
-<!-- START -->
+<canvas id="matrix"></canvas>
+
 <div id="startScreen" class="section">
 <div class="card">
 <h1>💖 Gửi tình yêu của anh 💖</h1>
@@ -130,12 +128,10 @@ button{
 </div>
 </div>
 
-<!-- SLIDE -->
 <div id="slideshow" class="section" style="display:none;">
 <img id="slideImage">
 </div>
 
-<!-- LOVE TEXT -->
 <div id="loveText"></div>
 
 <script>
@@ -143,18 +139,21 @@ button{
 /* ================= MATRIX HEART ================= */
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
+
+function resize(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
+}
+resize();
+window.onresize=resize;
 
 const hearts=["💗","💖","💕","💓","💞","💘"];
 const fontSize=22;
-const columns=canvas.width/fontSize;
-const drops=[];
-
-for(let x=0;x<columns;x++) drops[x]=1;
+let columns=canvas.width/fontSize;
+let drops=Array(Math.floor(columns)).fill(1);
 
 function draw(){
-ctx.fillStyle="rgba(0,0,0,0.07)";
+ctx.fillStyle="rgba(0,0,0,0.08)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="#ff4da6";
 ctx.font=fontSize+"px Arial";
@@ -169,23 +168,34 @@ drops[i]++;
 setInterval(draw,50);
 
 /* ================= MUSIC ================= */
-// ====== iPhone Autoplay Fix ======
-function startAudio() {
-  audio.play();
-  hint.style.display = "none";
-  window.removeEventListener("touchstart", startAudio);
-  window.removeEventListener("click", startAudio);
-}
+const music=document.getElementById("music");
+music.volume=0.8;
 
-window.addEventListener("touchstart", startAudio);
-window.addEventListener("click", startAudio);
+function unlockAudio(){
+music.play().then(()=>{
+music.pause();
+music.currentTime=0;
+}).catch(()=>{});
+document.removeEventListener("touchstart",unlockAudio);
+document.removeEventListener("click",unlockAudio);
+}
+document.addEventListener("touchstart",unlockAudio);
+document.addEventListener("click",unlockAudio);
+
+function toggleMusic(){
+if(music.paused){
+music.play();
+}else{
+music.pause();
+}
+}
 
 /* ================= START ================= */
 function startShow(){
 const name=document.getElementById("nameInput").value;
 if(name.trim()==="") return;
 
-music.play().then(()=>fadeInMusic()).catch(()=>{});
+music.play().catch(()=>{});
 
 document.getElementById("startScreen").style.display="none";
 document.getElementById("slideshow").style.display="flex";
@@ -222,13 +232,13 @@ setTimeout(startLoveStory,4500);
 
 /* ================= LOVE STORY ================= */
 const messages=[
-"Chào EmVy dấu iu của anh",
-"Cảm ơn em thời gian qua đã cho anh biết thế nào là",
-"Lo Lắng",
-"Sợ Hãi",
-"Lo Âu",
-"Nhưng không sao",
-"Chúc em thật hạnh phúc bên anh nhé",
+"Chào em yêu của anh",
+"Cảm ơn em vì đã xuất hiện trong cuộc đời anh",
+"Dù có lo lắng",
+"Có sợ hãi",
+"Có những ngày mệt mỏi",
+"Nhưng anh luôn ở đây",
+"Chúc chúng ta luôn hạnh phúc",
 "I Love You 💖"
 ];
 
@@ -260,5 +270,4 @@ showNextLine();
 </script>
 
 </body>
-
 </html>
