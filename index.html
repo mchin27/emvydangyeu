@@ -115,13 +115,10 @@ button{
 <body>
 
 <!-- NHẠC ONLINE -->
-<audio id="music" loop crossorigin="anonymous">
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0a9c6e0.mp3?filename=romantic-background-112189.mp3" type="audio/mpeg">
-</audio>
+<canvas id="canvas"></canvas>
+<div id="hint">Chạm màn hình để bật nhạc ❤️</div>
 
-<button id="musicToggle" onclick="toggleMusic()">🔊 Nhạc</button>
-
-<canvas id="matrix"></canvas>
+<audio id="bgm" src="noitinhyeubatdau.mp3" loop></audio>
 
 <!-- START -->
 <div id="startScreen" class="section">
@@ -172,28 +169,16 @@ drops[i]++;
 setInterval(draw,50);
 
 /* ================= MUSIC ================= */
-const music=document.getElementById("music");
-music.volume=0;
-
-function fadeInMusic(){
-let vol=0;
-const fade=setInterval(()=>{
-    if(vol<1){
-        vol+=0.05;
-        music.volume=vol;
-    }else{
-        clearInterval(fade);
-    }
-},150);
+// ====== iPhone Autoplay Fix ======
+function startAudio() {
+  audio.play();
+  hint.style.display = "none";
+  window.removeEventListener("touchstart", startAudio);
+  window.removeEventListener("click", startAudio);
 }
 
-function toggleMusic(){
-if(music.paused){
-    music.play();
-}else{
-    music.pause();
-}
-}
+window.addEventListener("touchstart", startAudio);
+window.addEventListener("click", startAudio);
 
 /* ================= START ================= */
 function startShow(){
@@ -275,4 +260,5 @@ showNextLine();
 </script>
 
 </body>
+
 </html>
